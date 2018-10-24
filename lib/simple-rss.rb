@@ -122,6 +122,14 @@ class SimpleRSS
             nil
           end
           item[clean_tag("#{tag}_#{attrib}")] = clean_content(tag, attrib, Regexp.last_match(3)) if Regexp.last_match(3)
+
+        elsif tag.to_s == 'category'
+          cats = match[3].scan(%r{<(rss:|atom:)?#{tag}(.*?)>(.*?)</(rss:|atom:)?#{tag}>}mi).map{|m| m[2]}
+          unless cats.empty?
+            item[clean_tag(tag)] = clean_content(tag, nil, cats.last)
+            item[clean_tag(:categories)] = cats.map{|c| clean_content(tag, nil, c)}
+          end
+
         else
           if match[3] =~ %r{<(rss:|atom:)?#{tag}(.*?)>(.*?)</(rss:|atom:)?#{tag}>}mi
             nil
